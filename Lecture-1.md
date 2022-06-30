@@ -176,7 +176,13 @@ g++ main.o sum.o product.o -o test
 
 #### 13. Please explain the usage of header files (头文件). Can we define the function body (函数体) in the header file? Do we need to compile header files using g++? Why?
 
-- 头文件是用来使多文件项目可以顺利完成正常编译的必要部分。因为多文件项目中的某些编译单元定义了某些函数或者变量，而另一些编译单元又需要使用（调用）这些函数或者变量，此时我们把这些函数和变量的声明统一放在一个头文件之中，这样我们只需要在每个编译单元之中使用预处理器将头文件包含进去，就可以正常完成编译，而不会出现未声明就使用的错误。而且，头文件使整个项目中出现的函数和变量列出，显得十分有条理。
+- Header files (`.h` files) is essential for projects with multiple files to be able to compile. For a project with multiple coding components (multiple `.cpp` files, etc), when a function or variable in one file needs to call another function or variable in another file, a header file that declares the function needs to be included (via preprocessing and linking) for the caller to be able to find the callee, without getting `error: undeclared identifier`. Besides, header files can list all functions and variables in the project, and can indicate their meanings (possibly with comments) without getting tripped by the implementation details.
+- In practice, we *can* define the function body in the header files, but it is not recommended. This is because a normal functions can only be defined once, albeit being legal to be declared multiple times. If a `.h` file is included multiple times, when `*.o`s are to be linked, a function defined in `*.h` can easily cause `error: multiple definition`. Therefure, unless you can make sure that your header file is included once and only once, DON'T define functions in header files; only declare them!
+- However, `inline` functions are required to be defined in header files, otherwise other components would not be able to call the `inline` function.
+- Header files do not need to be compiled explicitly. Since they only declare functions and variables, they are implicitly included into compiled objects via preprocessing. 
+
+
+头文件是用来使多文件项目可以顺利完成正常编译的必要部分。因为多文件项目中的某些编译单元定义了某些函数或者变量，而另一些编译单元又需要使用（调用）这些函数或者变量，此时我们把这些函数和变量的声明统一放在一个头文件之中，这样我们只需要在每个编译单元之中使用预处理器将头文件包含进去，就可以正常完成编译，而不会出现未声明就使用的错误。而且，头文件使整个项目中出现的函数和变量列出，显得十分有条理。
 - 在头文件中，对于普通函数的定义是不允许的，因为这样可能出现链接时出现重复定义的错误，普通函数可以多次声明但不可以多次定义。但是如果是内联函数，就必须写在头文件之中，不能写在任何其他的编译单元之中，否则在分段编译形成目标文件之后，对应的内联函数的标识符就会被编译器自动替换为整个函数体，此时该标识符就不存在了，于是在其他的编译单元中调用该内联函数时就会报错。
 - 头文件是不需要单独编译的，因为头文件之中只是一些函数和变量等等的声明而已，通过预处理过程被包含进独立的编译单元之中，成为该编译单元的一部分，此时参与到编译之中。
 
